@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles-bright.css" />
+    <title>Sako Hussein Ahmed - 18084@auis.edu.krd</title>
+    <!-- Include the appropriate CSS file -->
+    <style>
+      .bright {
+        background-color: white;
+        color: black;
+      }
+
+      .dark {
+        background-color: black;
+        color: white;
+      }
+      .tableStyle {
+        border: 1px solid blue;
+        padding: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Course Information</h1>
+
+    <table class="tableStyle">
+      <thead class="tableStyle">
+        <tr class="tableStyle">
+          <th class="tableStyle">Course Title</th>
+          <th class="tableStyle">Meeting Time</th>
+          <th class="tableStyle">Meeting Location</th>
+          <th class="tableStyle">Course Description</th>
+        </tr>
+      </thead>
+      <tbody class="tableStyle">
+        <tr class="tableStyle">
+          <td class="tableStyle">ITE404</td>
+          <td class="tableStyle">Monday 10:00 AM - 12:00 PM</td>
+          <td class="tableStyle">Room 101</td>
+          <td class="tableStyle">
+            Introduction to Node.js and Web Development
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <script>
+      // Get the current hour
+      let currentHour = new Date().getHours() + 5;
+
+      // Get the body element
+      let body = document.querySelector("body");
+
+      // Check the current time and change the background color accordingly
+      if (currentHour >= 7 && currentHour < 19) {
+        body.className = "bright";
+      } else {
+        body.className = "dark";
+      }
+    </script>
+  </body>
+</html>
