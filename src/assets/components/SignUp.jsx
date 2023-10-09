@@ -6,6 +6,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { collection, onSnapshot, doc, setDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   useEffect(() => {

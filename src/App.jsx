@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { authentication } from "./assets/email_signin/config";
 import { loginUser, setLoading } from "./features/userSlice";
 import Vendor from "./assets/components/Vendor";
+import MapBoxJl from "./assets/pages/MapBoxJl";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -36,6 +37,7 @@ const App = () => {
       <Route path="/:productId" element={<Vendor />} />
       <Route path="/login" element={<Signin />} />
       <Route path="/Signup" element={<SignUp />} />
+      <Route path="/map" element={<MapBoxJl />} />
     </Routes>
   );
 };

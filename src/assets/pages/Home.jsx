@@ -11,6 +11,7 @@ import { AvatarComp } from "../components/AvatarComp";
 import IMAGES from "../../Images/Images";
 import Recomendations from "../components/Recomendations";
 import Events from "./Events";
+import Footer from "../components/Footer";
 
 const images = [IMAGES.Image1, IMAGES.Image2, IMAGES.Image3];
 const Home = () => {
@@ -39,6 +40,20 @@ const Home = () => {
     };
     setLineStyle(style);
   };
+  let nav = [
+    {
+      name: "Home",
+      link: "/",
+    },
+    {
+      name: "Reservation",
+      link: "#",
+    },
+    {
+      name: "Map",
+      link: "/map",
+    },
+  ];
 
   return (
     <div className="bg-cover  text-white bg-center	object-cover bg-[linear-gradient(to_right_bottom,rgba(0,0,0,0.8),rgba(20,33,61,0.8)),url('/public/pexels-raditya-narendrasuta-11221497.jpg')] h-[155vh] m-8 rounded-3xl">
@@ -49,13 +64,13 @@ const Home = () => {
         style={lineStyle}
       ></div>
       <div className="flex w-full  items-center justify-around h-[10vh]  ">
-        <div className="w-1/4 flex justify-center">Logo</div>
+        <div className="w-1/4 flex justify-center">AHARS</div>
         <ul className="flex justify-between w-1/4 ">
-          {["Home", "Reservation", "Map"].map((link) => (
-            <li key={link} onClick={() => handleLinkClick(link)}>
-              <a href="#" ref={refs[link]}>
-                {link}
-              </a>
+          {nav.map((link) => (
+            <li key={link.name} onClick={() => handleLinkClick(link)}>
+              <Link to={link.link} ref={refs[link]}>
+                {link.name}
+              </Link>
             </li>
           ))}
         </ul>
@@ -98,6 +113,7 @@ const Home = () => {
       </div>
       {user && <Recomendations />}
       <Events />
+      <Footer />
     </div>
   );
 };

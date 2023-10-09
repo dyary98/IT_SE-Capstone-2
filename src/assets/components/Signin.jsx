@@ -2,16 +2,18 @@ import React, { useEffect, useState } from "react";
 import { authentication, provider } from "../email_signin/config";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import Home from "../pages/Home";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const Signin = () => {
   const [value, setValue] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+  const navigate = useNavigate();
   const handlSignIn = (e) => {
     e.preventDefault();
     signInWithEmailAndPassword(authentication, email, password)
       .then((userCredentials) => {
         console.log(userCredentials);
+        navigate("/");
       })
       .catch((error) => {
         console.log(error);
@@ -21,12 +23,13 @@ const Signin = () => {
     signInWithPopup(authentication, provider).then((data) => {
       setValue(data.user.email);
       localStorage.setItem("email", data.user.email);
+      navigate("/");
     });
   };
 
   useEffect(() => {
     setValue(localStorage.getItem("email"));
-  });
+  }, []);
 
   return (
     <div>
