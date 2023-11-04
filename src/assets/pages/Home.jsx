@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import Intro from "../components/Intro";
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../../features/userSlice";
 import { signOut } from "firebase/auth";
 import { authentication } from "../email_signin/config";
 import { AvatarComp } from "../components/AvatarComp";
@@ -12,13 +11,14 @@ import IMAGES from "../../Images/Images";
 import Recomendations from "../components/Recomendations";
 import Events from "./Events";
 import Footer from "../components/Footer";
+import { authActions } from "../../app/AuthSlice";
 
 const images = [IMAGES.Image1, IMAGES.Image2, IMAGES.Image3];
 const Home = () => {
-  const user = useSelector((state) => state.data.user.user);
+  const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const handelLogout = () => {
-    dispatch(logoutUser());
+    dispatch(authActions.logout());
     signOut(authentication);
   };
 

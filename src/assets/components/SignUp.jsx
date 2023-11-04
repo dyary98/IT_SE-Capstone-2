@@ -6,7 +6,6 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { collection, onSnapshot, doc, setDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   useEffect(() => {
@@ -31,7 +30,7 @@ const SignUp = () => {
         return setDoc(doc(db, "users", user.uid), {
           fullName: fullName,
           email: email,
-          // Add any other fields you want to include here
+          userRole: 1,
         });
       })
       .then(() => {
