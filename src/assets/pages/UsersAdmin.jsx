@@ -424,7 +424,7 @@ const Table = () => {
       {/* Sidebar */}
       <Sidebar />
       {/* Table */}
-      <div className="flex flex-col items-center h-full w-full">
+      <div className="flex flex-col items-center h-full w-full pl-72 py-4 pr-8">
         <div className="bg-white shadow-md rounded-lg p-4 w-full max-w-screen-xl">
           <input
             type="text"

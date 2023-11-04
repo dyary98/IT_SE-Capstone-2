@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 const Sidebar = () => {
   return (
-    <div className="h-screen bg-gray-800 text-white w-64 p-6 h-full">
+    <div className=" bg-gray-800 text-white w-64 p-6 h-full fixed">
       <h1 className="text-2xl font-semibold">Admin Panel</h1>
       <ul className="mt-6">
         <li className="mb-4 flex items-center space-x-2">

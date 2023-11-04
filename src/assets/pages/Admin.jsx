@@ -4,7 +4,7 @@ import Content from "../components/AdminContent";
 
 const Admin = () => {
   return (
-    <div className="flex">
+    <div className="flex h-[200vh] ">
       <Sidebar />
       <Content />
     </div>
