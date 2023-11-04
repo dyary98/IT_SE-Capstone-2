@@ -1,8 +1,7 @@
-// src/components/Sidebar.js
-
+import { Link } from "react-router-dom";
 const Sidebar = () => {
   return (
-    <div className="h-screen bg-gray-800 text-white w-64 p-6">
+    <div className="h-screen bg-gray-800 text-white w-64 p-6 h-full">
       <h1 className="text-2xl font-semibold">Admin Panel</h1>
       <ul className="mt-6">
         <li className="mb-4 flex items-center space-x-2">
@@ -20,9 +19,10 @@ const Sidebar = () => {
               d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
             />
           </svg>
-          <a href="#" className="text-lg">
+          <Link to="/admin" className="text-lg">
+            {" "}
             Dashboard
-          </a>
+          </Link>
         </li>
         <li className="mb-4 flex items-center space-x-2">
           <svg
@@ -39,9 +39,10 @@ const Sidebar = () => {
               d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
             />
           </svg>
-          <a href="#" className="text-lg">
+          <Link to="/admin/users" className="text-lg">
+            {" "}
             Users
-          </a>
+          </Link>
         </li>
         <li className="mb-4 flex items-center space-x-2">
           <svg
@@ -63,9 +64,10 @@ const Sidebar = () => {
               d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
             />
           </svg>
-          <a href="#" className="text-lg">
+          <Link to="#" className="text-lg">
+            {" "}
             Settings
-          </a>
+          </Link>
         </li>
       </ul>
     </div>
