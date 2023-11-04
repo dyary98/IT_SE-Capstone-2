@@ -9,6 +9,7 @@ import { authActions } from "./app/AuthSlice";
 import Vendor from "./assets/components/Vendor";
 import MapBoxJl from "./assets/pages/MapBoxJl";
 import Admin from "./assets/pages/Admin";
+import SettingsAdmin from "./assets/pages/SettingsAdmin";
 import UsersAdmin from "./assets/pages/UsersAdmin";
 
 const App = () => {
@@ -43,6 +44,7 @@ const App = () => {
       <Route path="/map" element={<MapBoxJl />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="/admin/users" element={<UsersAdmin />} />
+      <Route path="/admin/settings" element={<SettingsAdmin />} />
     </Routes>
   );
 };
