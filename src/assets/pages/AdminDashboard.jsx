@@ -1,7 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { authentication, db } from "../email_signin/config"; // Adjust the import path as needed
-import { doc, getDoc, collection, addDoc } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  query,
+  getDocs,
+  deleteDoc,
+} from "firebase/firestore";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 const Card = ({ title, value }) => {
   return (
     <div className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg p-5 flex flex-col justify-between transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105">
@@ -29,6 +43,16 @@ const AdminDashboard = () => {
           setFullName(userSnap.data().fullName || user.email); // Fallback to email if fullName not available
         }
       }
+
+      // Fetch images
+      const imagesRef = collection(db, "users", user.uid, "images");
+      const imageQuery = query(imagesRef);
+      const imageSnapshots = await getDocs(imageQuery);
+      const userImages = imageSnapshots.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setImages(userImages);
     };
 
     fetchUserData();
@@ -62,6 +86,27 @@ const AdminDashboard = () => {
       setImageFile(null);
     } catch (error) {
       console.error("Error uploading image: ", error);
+    }
+  };
+
+  const handleDeleteImage = async (imageId, imageUrl) => {
+    try {
+      // Create a reference to the file to delete
+      const storage = getStorage();
+      const imageRef = ref(storage, imageUrl);
+
+      // Delete the file
+      await deleteObject(imageRef);
+
+      // Delete the document from Firestore
+      await deleteDoc(
+        doc(db, "users", authentication.currentUser.uid, "images", imageId)
+      );
+
+      // Update local state
+      setImages(images.filter((image) => image.id !== imageId));
+    } catch (error) {
+      console.error("Error deleting image: ", error);
     }
   };
 
@@ -135,14 +180,20 @@ const AdminDashboard = () => {
           </form>
           {/* Display images here */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {images.map((image, index) => (
+            {images.map((image) => (
               <div
-                key={index}
+                key={image.id}
                 className="max-w-sm rounded overflow-hidden shadow-lg"
               >
                 <img className="w-full" src={image.url} alt="Uploaded" />
-                <div className="px-6 py-4">
+                <div className="px-6 py-4 flex justify-between items-center">
                   <p className="text-gray-700 text-base">{image.description}</p>
+                  <button
+                    onClick={() => handleDeleteImage(image.id, image.url)}
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}
