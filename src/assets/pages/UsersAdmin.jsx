@@ -8,6 +8,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Sidebar from "../components/Sidebar";
+import CreateUserForm from "./CreateUserForm";
 
 const Table = () => {
   const data = useMemo(
@@ -420,11 +421,13 @@ const Table = () => {
   });
 
   return (
-    <div className="flex h-[100vh] bg-white">
+    <div className="flex h-[120vh] bg-white">
       {/* Sidebar */}
       <Sidebar />
       {/* Table */}
+
       <div className="flex flex-col items-center h-full w-full pl-72 py-4 pr-8">
+        <CreateUserForm />
         <div className="bg-white shadow-md rounded-lg p-4 w-full max-w-screen-xl">
           <input
             type="text"
