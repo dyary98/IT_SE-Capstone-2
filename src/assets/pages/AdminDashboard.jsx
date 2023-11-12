@@ -126,17 +126,32 @@ const AdminDashboard = () => {
   };
 
   const handleAddTime = async () => {
-    if (!newTime.startTime || !newTime.endTime) return;
+    if (!newTime.startTime || !newTime.endTime) {
+      console.error("Start Time and End Time are required.");
+      return;
+    }
+
+    // Generate a new ID for the time slot or use an existing identifier
+    const newId =
+      newTime.id ||
+      doc(
+        collection(db, "users", authentication.currentUser.uid, "availability")
+      ).id;
 
     try {
-      // Add new time slot to Firestore
-      const docRef = await addDoc(
-        collection(db, "users", authentication.currentUser.uid, "availability"),
-        newTime
+      // Set the new time slot with the custom ID
+      await setDoc(
+        doc(db, "users", authentication.currentUser.uid, "availability", newId),
+        {
+          ...newTime,
+          id: newId, // Include the ID in the document if you want to store it
+        }
       );
 
-      // Update local state with new time slot including generated Firestore document ID
-      setAvailability([...availability, { ...newTime, id: docRef.id }]);
+      // Update local state with new time slot including the custom ID
+      setAvailability([...availability, { ...newTime, id: newId }]);
+
+      // Reset form fields
       setNewTime({ startTime: "", endTime: "", available: false });
     } catch (error) {
       console.error("Error adding time slot: ", error);

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -8,357 +8,26 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Sidebar from "../components/Sidebar";
-import CreateUserForm from "./CreateUserForm";
-
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../email_signin/config";
+import { Link } from "react-router-dom";
 const Table = () => {
-  const data = useMemo(
-    () => [
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      {
-        id: 1,
-        name: "John Doe",
-        email: "john@example.com",
-        phone: "123-456-7890",
-        user_role: 0,
-        created_at: "2023-01-01 08:00:00",
-        updated_at: "2023-01-02 09:00:00",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "jane@example.com",
-        phone: "987-654-3210",
-        user_role: 0,
-        created_at: "2023-02-01 10:00:00",
-        updated_at: "2023-02-02 11:00:00",
-      },
-      // ... more users
-    ],
-    []
-  );
+  const [userData, setUserData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const querySnapshot = await getDocs(collection(db, "users")); // Replace "users" with your collection name
+      const users = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setUserData(users);
+    };
+
+    fetchData();
+  }, []);
+
+  const data = useMemo(() => userData, [userData]);
 
   const [sorting, setSorting] = useState([]);
   const [filtering, setFiltering] = useState("");
@@ -371,7 +40,7 @@ const Table = () => {
     },
     {
       header: "Name",
-      accessorKey: "name",
+      accessorKey: "fullName",
       footer: "name",
     },
     {
@@ -381,7 +50,7 @@ const Table = () => {
     },
     {
       header: "User Role",
-      accessorKey: "user_role",
+      accessorKey: "userRole",
       footer: "user_role",
     },
     {
@@ -421,18 +90,27 @@ const Table = () => {
   });
 
   return (
-    <div className="flex h-[120vh] bg-white">
-      {/* Sidebar */}
+    <div className="flex h-[120vh] bg-gray-100">
+      {" "}
+      {/* Updated background color for a lighter look */}
       <Sidebar />
-      {/* Table */}
-
       <div className="flex flex-col items-center h-full w-full pl-72 py-4 pr-8">
-        <CreateUserForm />
-        <div className="bg-white shadow-md rounded-lg p-4 w-full max-w-screen-xl">
+        <div className="bg-white p-4 w-full max-w-screen-xl">
+          <div className="bg-white p-4 w-full max-w-screen-xl">
+            {/* Add the new user button */}
+            <Link
+              to="/admin/users/create"
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 mb-4"
+            >
+              Create New User
+            </Link>
+            {/* ... (rest of your table and search input) */}
+          </div>
+          {/* Search input styling updated for a flat look */}
           <input
             type="text"
             value={filtering}
-            className="block w-full px-4 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="block w-full px-4 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:outline-none"
             placeholder="Search anything..."
             onChange={(e) => setFiltering(e.target.value)}
           />
