@@ -8,6 +8,7 @@ import {
   query,
   getDocs,
   deleteDoc,
+  setDoc,
 } from "firebase/firestore";
 import {
   getStorage,
@@ -31,7 +32,11 @@ const AdminDashboard = () => {
   const [availability, setAvailability] = useState([]);
   const [description, setDescription] = useState("");
   const [imageFile, setImageFile] = useState(null);
-  const [newTime, setNewTime] = useState("");
+  const [newTime, setNewTime] = useState({
+    startTime: "",
+    endTime: "",
+    available: false,
+  });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -53,6 +58,16 @@ const AdminDashboard = () => {
         ...doc.data(),
       }));
       setImages(userImages);
+
+      // Fetch time slots (availability)
+      const availabilityRef = collection(db, "users", user.uid, "availability");
+      const availabilityQuery = query(availabilityRef);
+      const availabilitySnapshots = await getDocs(availabilityQuery);
+      const userAvailability = availabilitySnapshots.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setAvailability(userAvailability);
     };
 
     fetchUserData();
@@ -110,13 +125,64 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleAddTime = () => {
-    setAvailability([...availability, newTime]);
-    setNewTime("");
+  const handleAddTime = async () => {
+    if (!newTime.startTime || !newTime.endTime) return;
+
+    try {
+      // Add new time slot to Firestore
+      const docRef = await addDoc(
+        collection(db, "users", authentication.currentUser.uid, "availability"),
+        newTime
+      );
+
+      // Update local state with new time slot including generated Firestore document ID
+      setAvailability([...availability, { ...newTime, id: docRef.id }]);
+      setNewTime({ startTime: "", endTime: "", available: false });
+    } catch (error) {
+      console.error("Error adding time slot: ", error);
+    }
   };
 
-  const handleRemoveTime = (timeToRemove) => {
-    setAvailability(availability.filter((time) => time !== timeToRemove));
+  const handleRemoveTime = async (timeId) => {
+    try {
+      // Remove time slot from Firestore
+      await deleteDoc(
+        doc(db, "users", authentication.currentUser.uid, "availability", timeId)
+      );
+
+      // Update local state
+      setAvailability(availability.filter((time) => time.id !== timeId));
+    } catch (error) {
+      console.error("Error removing time slot: ", error);
+    }
+  };
+
+  const handleToggleAvailability = async (timeId) => {
+    const slot = availability.find((time) => time.id === timeId);
+    if (slot) {
+      try {
+        const updatedSlot = { ...slot, available: !slot.available };
+
+        // Update time slot in Firestore
+        await setDoc(
+          doc(
+            db,
+            "users",
+            authentication.currentUser.uid,
+            "availability",
+            timeId
+          ),
+          updatedSlot
+        );
+
+        // Update local state
+        setAvailability(
+          availability.map((time) => (time.id === timeId ? updatedSlot : time))
+        );
+      } catch (error) {
+        console.error("Error updating time slot: ", error);
+      }
+    }
   };
   const firstName = fullName.split(" ")[0];
   const initial = firstName.charAt(0);
@@ -201,42 +267,78 @@ const AdminDashboard = () => {
         </section>
 
         <section className="mb-8">
+          {/* Form for adding new time slots */}
           <div className="flex gap-4 mb-4">
             <input
               type="text"
-              value={newTime}
-              onChange={(e) => setNewTime(e.target.value)}
-              placeholder="Add Available Time"
+              value={newTime.startTime}
+              onChange={(e) =>
+                setNewTime({ ...newTime, startTime: e.target.value })
+              }
+              placeholder="Start Time"
               className="px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700"
             />
+            <input
+              type="text"
+              value={newTime.endTime}
+              onChange={(e) =>
+                setNewTime({ ...newTime, endTime: e.target.value })
+              }
+              placeholder="End Time"
+              className="px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700"
+            />
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={newTime.available}
+                onChange={(e) =>
+                  setNewTime({ ...newTime, available: e.target.checked })
+                }
+              />
+              <span className="ml-2">Available</span>
+            </label>
             <button
               onClick={handleAddTime}
               className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded cursor-pointer transition-colors"
             >
-              Add Time
+              Add Time Slot
             </button>
           </div>
 
+          {/* The rest of your time slot display section... */}
+          {/* Table for displaying time slots */}
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white text-gray-900">
               <thead>
                 <tr className="bg-gray-800 text-white uppercase text-sm leading-normal">
-                  <th className="py-3 px-6 text-left">Time Slot</th>
+                  <th className="py-3 px-6 text-left">Start Time</th>
+                  <th className="py-3 px-6 text-left">End Time</th>
+                  <th className="py-3 px-6 text-center">Available</th>
                   <th className="py-3 px-6 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="text-gray-600 text-sm font-light">
-                {availability.map((time, index) => (
+                {availability.map((time) => (
                   <tr
-                    key={index}
+                    key={time.id}
                     className="border-b border-gray-200 hover:bg-gray-100"
                   >
                     <td className="py-3 px-6 text-left whitespace-nowrap">
-                      {time}
+                      {time.startTime}
+                    </td>
+                    <td className="py-3 px-6 text-left">{time.endTime}</td>
+                    <td className="py-3 px-6 text-center">
+                      {time.available ? "Yes" : "No"}
                     </td>
                     <td className="py-3 px-6 text-center">
                       <button
-                        onClick={() => handleRemoveTime(time)}
+                        onClick={() => handleToggleAvailability(time.id)}
+                        className="bg-green-500 text-white active:bg-green-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                      >
+                        Toggle
+                      </button>
+                      <button
+                        onClick={() => handleRemoveTime(time.id)}
                         className="bg-red-500 text-white active:bg-red-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                       >
                         Remove

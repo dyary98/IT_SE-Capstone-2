@@ -28,6 +28,8 @@ const Card = (props) => {
             className="inline-flex items-center px-3 py-2 w-28  justify-center text-sm font-medium text-center text-black bg-white rounded-lg hover:bg-blue-800 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300  dark:focus:ring-blue-800"
           >
             Reserve
+            {console.log(props.Id)}
+
           </Link>
         </div>
       </div>

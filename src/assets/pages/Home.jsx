@@ -1,17 +1,18 @@
 import React from "react";
 import Card from "../components/Card";
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Intro from "../components/Intro";
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signOut } from "firebase/auth";
-import { authentication } from "../email_signin/config";
 import { AvatarComp } from "../components/AvatarComp";
 import IMAGES from "../../Images/Images";
 import Recomendations from "../components/Recomendations";
 import Events from "./Events";
 import Footer from "../components/Footer";
 import { authActions } from "../../app/AuthSlice";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { authentication, db } from "../email_signin/config"; // Adjust based on your actual path
 
 const images = [IMAGES.Image1, IMAGES.Image2, IMAGES.Image3];
 const Home = () => {
@@ -55,6 +56,29 @@ const Home = () => {
     },
   ];
 
+  const [usersWithRole2, setUsersWithRole2] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("userRole", "==", 2));
+      const querySnapshot = await getDocs(q);
+      const users = [];
+      for (let doc of querySnapshot.docs) {
+        const userImagesRef = collection(db, "users", doc.id, "images");
+        const imagesSnapshot = await getDocs(userImagesRef);
+        const images = imagesSnapshot.docs.map((imgDoc) => imgDoc.data());
+        users.push({
+          uid: doc.id, // Store the document ID, which is the user's uid
+          fullName: doc.data().fullName,
+          images: images,
+        });
+      }
+      setUsersWithRole2(users);
+    };
+
+    fetchUsers();
+  }, []);
   return (
     <div className="bg-cover  text-white bg-center	object-cover bg-[linear-gradient(to_right_bottom,rgba(0,0,0,0.8),rgba(20,33,61,0.8)),url('/public/pexels-raditya-narendrasuta-11221497.jpg')] h-[155vh] m-8 rounded-3xl">
       <div
@@ -92,26 +116,18 @@ const Home = () => {
       </div>
       <Intro />
       <div className="flex justify-around items-start h-[50vh] w-full  relative ">
-        <Card
-          name="Twimalik Stadium"
-          description="Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quae officiis fugit perspiciatis ad nisi culpa cupiditate assumenda harum saepe totam!"
-          image={IMAGES.Image1}
-          Id="1"
-        />
-        <Card
-          name="Hawkary Stadium"
-          description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto reiciendis maiores aliquid, magni accusantium nobis?"
-          image={IMAGES.Image2}
-          Id="2"
-        />
-        <Card
-          name="Azadi Mili Stadium"
-          description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto reiciendis maiores aliquid, magni accusantium nobis?"
-          image={IMAGES.Image3}
-          Id="3"
-        />
+        {usersWithRole2.map((user, index) => (
+          <Card
+            key={index}
+            name={user.fullName}
+            description="Fixed Description Here" // Replace with actual description if available
+            image={user.images.length > 0 ? user.images[0].url : IMAGES.Image2} // Replace defaultImageUrl with a fallback image URL
+            Id={user.uid}
+          />
+        ))}
       </div>
       {user && <Recomendations />}
+
       <Events />
       <Footer />
     </div>
