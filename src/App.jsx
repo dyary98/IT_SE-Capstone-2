@@ -13,6 +13,7 @@ import SettingsAdmin from "./assets/pages/SettingsAdmin";
 import UsersAdmin from "./assets/pages/UsersAdmin";
 import VendorAdmin from "./assets/pages/VendorAdmin";
 import CreateUser from "./assets/pages/CreateUser";
+import AllVendors from "./assets/pages/AllVendors";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -40,7 +41,9 @@ const App = () => {
   return (
     <Routes>
       <Route path="/" element={<Home users={user} />} />
+      <Route path="/vendors" element={<AllVendors />} />
       <Route path="/:productId" element={<Vendor />} />
+      <Route path="/vendors/:productId" element={<Vendor />} />
       <Route path="/login" element={<Signin />} />
       <Route path="/Signup" element={<SignUp />} />
       <Route path="/map" element={<MapBoxJl />} />

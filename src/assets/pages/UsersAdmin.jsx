@@ -7,8 +7,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+
 import Sidebar from "../components/Sidebar";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { db } from "../email_signin/config";
 import { Link } from "react-router-dom";
 const Table = () => {
@@ -29,6 +30,14 @@ const Table = () => {
 
   const data = useMemo(() => userData, [userData]);
 
+  const deleteUser = async (userId) => {
+    try {
+      await deleteDoc(doc(db, "users", userId));
+      setUserData(userData.filter((user) => user.id !== userId));
+    } catch (error) {
+      console.error("Error deleting user: ", error);
+    }
+  };
   const [sorting, setSorting] = useState([]);
   const [filtering, setFiltering] = useState("");
 
@@ -70,7 +79,14 @@ const Table = () => {
     {
       header: "Delete",
       accessorKey: "delete",
-      cell: () => <button className="text-red-600">🗑️</button>,
+      cell: (info) => (
+        <button
+          className="text-red-600"
+          onClick={() => deleteUser(info.row.original.id)}
+        >
+          🗑️
+        </button>
+      ),
     },
   ];
 
