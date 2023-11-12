@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import { authentication } from "../email_signin/config";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
-import {
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-} from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import AdminDashboard from "./AdminDashboard";
 
 const VendorAdmin = () => {
@@ -50,25 +46,36 @@ const VendorAdmin = () => {
     }
   };
 
+  if (userDetails) {
+    return (
+      <>
+        <AdminDashboard />
+        <button
+          className="fixed top-4 right-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out transform hover:-translate-y-1 hover:scale-105"
+          onClick={handleSignOut}
+        >
+          Sign Out
+        </button>
+      </>
+    );
+  }
+
   return (
-    <div className="h-screen w-full">
+    <div className="flex items-center justify-center h-screen bg-gray-100">
       {userDetails ? (
         <>
           <AdminDashboard />
           <button
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out transform hover:-translate-y-1 hover:scale-105"
             onClick={handleSignOut}
           >
             Sign Out
           </button>
         </>
       ) : (
-        <div className="w-full max-w-xs">
-          <form
-            className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
-            onSubmit={signIn}
-          >
-            <div className="mb-4">
+        <div className="w-full max-w-md px-5 py-10 bg-white rounded-lg shadow-xl">
+          <form className="flex flex-col space-y-5" onSubmit={signIn}>
+            <div>
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
                 htmlFor="email"
@@ -76,14 +83,15 @@ const VendorAdmin = () => {
                 Email
               </label>
               <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
                 id="email"
                 type="email"
                 placeholder="Email"
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div className="mb-6">
+            <div>
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
                 htmlFor="password"
@@ -91,16 +99,17 @@ const VendorAdmin = () => {
                 Password
               </label>
               <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
                 id="password"
                 type="password"
-                placeholder="******************"
+                placeholder="Password"
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div className="flex items-center justify-between">
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200 ease-in-out transform hover:-translate-y-1 hover:scale-105"
                 type="submit"
               >
                 Sign In
@@ -108,7 +117,9 @@ const VendorAdmin = () => {
             </div>
           </form>
           {loginError && (
-            <p className="text-red-500 text-xs italic">{loginError}</p>
+            <p className="mt-4 text-center text-red-500 text-xs italic">
+              {loginError}
+            </p>
           )}
         </div>
       )}
