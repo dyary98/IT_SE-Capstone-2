@@ -53,7 +53,11 @@ export default function MapBoxJl() {
               latitude={user.latitude}
               anchor="bottom"
               color="red"
-              onClick={() => setSelectedUser(user)} // When marker is clicked, set the selected user
+              onClick={(event) => {
+                // Prevent map click event from firing
+                event.originalEvent.stopPropagation();
+                setSelectedUser(user);
+              }}
             />
 
             {selectedUser?.id === user.id ? ( // Check if this user's popup should be shown
