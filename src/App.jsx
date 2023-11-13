@@ -14,9 +14,12 @@ import UsersAdmin from "./assets/pages/UsersAdmin";
 import VendorAdmin from "./assets/pages/VendorAdmin";
 import CreateUser from "./assets/pages/CreateUser";
 import AllVendors from "./assets/pages/AllVendors";
+import { useTranslation } from 'react-i18next';
+
 
 const App = () => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   useEffect(() => {
     authentication.onAuthStateChanged((authUser) => {
@@ -39,7 +42,11 @@ const App = () => {
   console.log(user);
 
   return (
-    <Routes>
+
+    <div>
+      {/* <h1>{t('Game on')}</h1>
+      <p>{t('home')}</p> */}
+      <Routes>
       <Route path="/" element={<Home users={user} />} />
       <Route path="/vendors" element={<AllVendors />} />
       <Route path="/:productId" element={<Vendor />} />
@@ -53,6 +60,8 @@ const App = () => {
       <Route path="/admin/settings" element={<SettingsAdmin />} />
       <Route path="/admin/vendor" element={<VendorAdmin />} />
     </Routes>
+    </div>
+    
   );
 };
 

@@ -17,6 +17,7 @@ import {
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
+import ReservationsComponent from "../components/ReservationsComponent";
 const Card = ({ title, value }) => {
   return (
     <div className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg p-5 flex flex-col justify-between transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105">
@@ -221,6 +222,7 @@ const AdminDashboard = () => {
         <Card title="Satisfaction Rate" value="95%" />
       </div>
 
+      <ReservationsComponent fullName={fullName} setFullName={setFullName} />
       {/* Chart placeholder - remains unchanged */}
 
       <div className="bg-gray-900 min-h-screen p-5 text-gray-100">
