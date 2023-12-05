@@ -208,23 +208,21 @@ const AdminDashboard = () => {
       <div className="text-center text-4xl font-bold mb-10 text-white">
         Admin Dashboard
       </div>
-
       <div className="flex items-center space-x-4 mb-8">
         <div className="rounded-full h-12 w-12 flex items-center justify-center bg-blue-500 text-white text-xl font-semibold">
           {initial}
         </div>
         <span className="font-medium text-lg text-white">{firstName}</span>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Cards */}
-        <Card title="Total Revenue" value="$5,000" />
+      <div className="flex justify-center w-full">
+        {/* Moved the Cards inside a centered flex container */}
         <Card title="Active Users" value="4,200" />
-        <Card title="Satisfaction Rate" value="95%" />
-      </div>
-
+      </div>{" "}
+      {/* Cards */}
+      {/* <Card title="Total Revenue" value="$5,000" /> */}
+      {/* <Card title="Satisfaction Rate" value="95%" /> */}
       <ReservationsComponent fullName={fullName} setFullName={setFullName} />
       {/* Chart placeholder - remains unchanged */}
-
       <div className="bg-gray-900 min-h-screen p-5 text-gray-100">
         <section className="mb-8">
           <form onSubmit={handleAddImage} className="flex flex-col gap-4">

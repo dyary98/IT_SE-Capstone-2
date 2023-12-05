@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { authentication } from "../email_signin/config";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { authentication, db } from "../email_signin/config";
+import { doc, getDoc } from "firebase/firestore";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import AdminDashboard from "./AdminDashboard";
 
@@ -10,7 +10,6 @@ const VendorAdmin = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [loginError, setLoginError] = useState("");
 
-  const db = getFirestore();
 
   const signIn = async (e) => {
     e.preventDefault();
@@ -21,16 +20,13 @@ const VendorAdmin = () => {
         password
       );
       const userId = userCredential.user.uid;
-      const userDoc = await getDoc(doc(db, "users", userId));
-
-      if (userDoc.exists() && userDoc.data().userRole === 2) {
-        setUserDetails({
-          fullName: userDoc.data().fullName,
-          email: userDoc.data().email,
-        });
-      } else {
-        setLoginError("Unauthorized access or invalid role");
-      }
+      console.log(userId);
+      const userDoc = await getDoc(doc(db, "vendors", userId));
+      console.log(userDoc.data());
+      setUserDetails({
+        fullName: userDoc.data().fullName,
+        email: userDoc.data().email,
+      });
     } catch (error) {
       console.error("Error signing in with email and password", error);
       setLoginError("Failed to sign in");

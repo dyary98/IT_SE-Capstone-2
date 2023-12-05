@@ -9,23 +9,26 @@ import Card from "../components/Card";
 import Intro from "../components/Intro";
 import Recomendations from "../components/Recomendations";
 import Events from "./Events";
+import Ai from "./Ai";
 import Footer from "../components/Footer";
 import { AvatarComp } from "../components/AvatarComp";
 import IMAGES from "../../Images/Images";
 import { authActions } from "../../app/AuthSlice";
 import { authentication, db } from "../email_signin/config";
 import CardsLoader from "../components/CardsLoader"; // Ensure you have this component
+import { useTranslation } from "react-i18next";
+import i18n from "../../i18n";
 
 const useFetchUsersWithRole2 = () => {
   return useQuery({
-    queryKey: "usersWithRole2",
+    queryKey: ["usersWithRole2"], // Changed to an array
     queryFn: async () => {
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("userRole", "==", 2));
+      const vendorRef = collection(db, "vendors");
+      const q = query(vendorRef);
       const querySnapshot = await getDocs(q);
       const usersData = await Promise.all(
         querySnapshot.docs.map(async (doc) => {
-          const userImagesRef = collection(db, "users", doc.id, "images");
+          const userImagesRef = collection(db, "vendors", doc.id, "images");
           const imagesSnapshot = await getDocs(userImagesRef);
           const images = imagesSnapshot.docs.map((imgDoc) => imgDoc.data().url);
           return {
@@ -35,12 +38,79 @@ const useFetchUsersWithRole2 = () => {
           };
         })
       );
+      console.log(usersData);
       return usersData;
     },
   });
 };
 
+const fetchUserReservations = async (userId) => {
+  const reservationsRef = collection(db, "users", userId, "reservations");
+  const querySnapshot = await getDocs(reservationsRef);
+  return querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+};
+
+const UserReservations = ({ userId }) => {
+  const [reservations, setReservations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const getReservations = async () => {
+      setIsLoading(true);
+      try {
+        const userReservations = await fetchUserReservations(userId);
+        setReservations(userReservations);
+      } catch (error) {
+        console.error("Error fetching reservations: ", error);
+      }
+      setIsLoading(false);
+    };
+
+    if (userId) {
+      getReservations();
+    }
+  }, [userId]);
+
+  if (isLoading) return <CardsLoader count={3} />; // Adjust count as needed for your loading component
+
+  return (
+    <div className="mb-8 p-4 bg-white shadow-lg rounded-md">
+      <h2 className="text-xl font-bold text-gray-800 mb-4">
+        Your Reservations
+      </h2>
+      <ul className="space-y-4">
+        {reservations.map((reservation) => (
+          <li
+            key={reservation.id}
+            className="border border-gray-300 p-4 rounded-lg hover:shadow-md transition-shadow"
+          >
+            <h3 className="text-lg font-semibold text-gray-700">
+              {reservation.stadiumName}
+            </h3>
+            <p className="text-gray-600">
+              <span className="font-medium">Start:</span>{" "}
+              {reservation.startDate.toLocaleString()}
+            </p>
+            <p className="text-gray-600">
+              <span className="font-medium">End:</span>{" "}
+              {reservation.endDate.toLocaleString()}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
 const Home = () => {
+  const changeLanguage = (language) => {
+    i18n.changeLanguage(language);
+  };
+  const { t } = useTranslation();
+
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const { data: usersWithRole2, isLoading } = useFetchUsersWithRole2();
@@ -70,15 +140,19 @@ const Home = () => {
   };
 
   let nav = [
-    { name: "Home", link: "/" },
-    { name: "Reservation", link: "#" },
-    { name: "Map", link: "/map" },
+    { name: t("home"), link: "/" },
+    { name: t("Reservation"), link: "#" },
+    { name: t("map"), link: "/map" },
   ];
 
   return (
     <div className="bg-cover text-white bg-center object-cover bg-[url('/public/pexels-raditya-narendrasuta-11221497.jpg')] h-[155vh] m-8 rounded-3xl">
       <div className="flex w-full items-center justify-around h-[10vh]">
-        <div className="w-1/4 flex justify-center">AHARS</div>
+        <div className="flex justify-center items-center h-20 ">
+          <div className="text-3xl font-bold text-blue-600">
+            VENUE <span className="text-white">STATION</span>
+          </div>
+        </div>
         <ul className="flex justify-between w-1/4">
           {nav.map((link, index) => (
             <li key={index} onClick={() => handleLinkClick(link.name)}>
@@ -93,12 +167,12 @@ const Home = () => {
             <div className="flex rounded-full text-black pr-2 bg-gray-500 hover:bg-gray-200">
               <AvatarComp name={user.fullName} />
               <button className="p-2" onClick={handleLogout}>
-                LogOut
+                {t("log out")}
               </button>
             </div>
           ) : (
             <button className="text-white">
-              <Link to="/login">Login</Link>
+              <Link to="/login">{t("log in")}</Link>
             </button>
           )}
         </div>
@@ -108,22 +182,22 @@ const Home = () => {
         {isLoading ? (
           <CardsLoader count={6} />
         ) : (
-          usersWithRole2.slice(4, 8).map(
-            (
-              user,
-              index // Only take the first 4 users
-            ) => (
-              <Card
-                key={user.uid}
-                name={user.fullName}
-                description="Fixed Description Here"
-                image={user.images[0]} // The first image from the user's images
-                Id={user.uid}
-              />
-            )
-          )
+          usersWithRole2.slice(2, 6).map((user) => (
+            <Card
+              key={user.uid}
+              name={user.fullName}
+              description={
+                user.description
+                  ? user.description
+                  : "This dose not have any description"
+              }
+              image={user.images[0]} // The first image from the user's images
+              Id={user.uid}
+            />
+          ))
         )}
       </div>
+
       <div className="flex justify-center">
         <Link
           className="bg-blue-500 w-40 text-white font-bold py-2 flex justify-center  px-4 rounded-md overflow-hidden relative shadow-lg transition duration-300 ease-out transform hover:-translate-y-1 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
@@ -135,7 +209,31 @@ const Home = () => {
       </div>
 
       {user && <Recomendations />}
+      {user && <UserReservations userId={user.uid} />}
+
       <Events />
+
+      <div className="space-x-2">
+        <button
+          onClick={() => changeLanguage("en")}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
+        >
+          English
+        </button>
+        <button
+          onClick={() => changeLanguage("ku")}
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
+        >
+          Kurdish
+        </button>
+        <button
+          onClick={() => changeLanguage("ar")}
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
+        >
+          Arabic
+        </button>
+      </div>
+
       <Footer />
     </div>
   );

@@ -3,6 +3,7 @@ import IMAGES from "../../Images/Images";
 import { FaStar } from "react-icons/fa";
 import { ImLocation } from "react-icons/im";
 import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import {
   doc,
   getDoc,
@@ -12,21 +13,22 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { authentication, db } from "../email_signin/config";
+import { authActions } from "../../app/AuthSlice";
 
 const Vendor = () => {
+  const dispatch = useDispatch();
+  const currentUser = useSelector((state) => state.auth.user); // Access the current user from Redux store
+
   const { productId } = useParams();
   const [user, setUser] = useState(null);
   const [images, setImages] = useState([]);
   const [availability, setAvailability] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
-
   const [newComment, setNewComment] = useState("");
   const [newRating, setNewRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const [currentUser, setCurrentUser] = useState(null);
-
-  // Hardcoded comments
   const [comments, setComments] = useState([
+    // Hardcoded comments
     {
       id: 1,
       user: "Alice",
@@ -42,6 +44,38 @@ const Vendor = () => {
       userImage: IMAGES.Image7,
     },
   ]);
+
+  useEffect(() => {
+    const unsubscribe = authentication.onAuthStateChanged((user) => {
+      if (user) {
+        dispatch(authActions.login(user));
+      } else {
+        dispatch(authActions.logout());
+      }
+    });
+
+    const fetchUserData = async () => {
+      const userRef = doc(db, "vendors", productId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        setUser(userSnap.data());
+        const availabilitySnap = await getDocs(
+          collection(userRef, "availability")
+        );
+        setAvailability(availabilitySnap.docs.map((doc) => doc.data()));
+        const imagesSnap = await getDocs(collection(userRef, "images"));
+        setImages(imagesSnap.docs.map((doc) => doc.data()));
+        const commentsSnap = await getDocs(collection(userRef, "comments"));
+        setComments(
+          commentsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        );
+      }
+    };
+
+    fetchUserData();
+    return () => unsubscribe();
+  }, [dispatch, productId]);
+
   const handleSelectSlot = (slotId) => {
     const slot = availability.find((s) => s.id === slotId);
     if (slot && slot.available) {
@@ -49,39 +83,47 @@ const Vendor = () => {
       console.log("Selected slot:", slotId);
     }
   };
+
   const handleReservation = async () => {
-    if (!selectedSlot || !user) {
-      alert("Please select a time slot and ensure you are logged in.");
+    const slotDetails = availability.find((slot) => slot.id === selectedSlot);
+    if (!selectedSlot) {
+      alert("Please select a time slot.");
+      return;
+    }
+
+    if (!currentUser || !currentUser.displayName) {
+      alert("Please ensure you are logged in with a valid account.");
       return;
     }
 
     const reservationDetails = {
-      userName: user.displayName, // Name of the user making the reservation
-      timeSlot: selectedSlot, // The selected time slot
-      reservationDate: new Date().toISOString(), // Current date and time
+      userName: currentUser?.displayName || "Unknown User",
+      stadiumName: user?.fullName || "Unknown Stadium",
+      startDate: slotDetails.startTime,
+      endDate: slotDetails.endTime,
+      reservationDate: new Date().toISOString(),
     };
 
     try {
-      // Reference to the reservations collection within the user document
-      const reservationsRef = collection(
+      const userReservationsRef = collection(
         db,
-        "users",
-        productId,
+        "vendors",
+        currentUser.uid,
         "reservations"
       );
+      await addDoc(userReservationsRef, reservationDetails);
 
-      // Add the reservation
+      const reservationsRef = collection(db, "reservations");
       await addDoc(reservationsRef, reservationDetails);
 
-      // Update the availability array to set the selected time slot as unavailable
-      const updatedAvailability = availability.map((slot) =>
-        slot.id === selectedSlot ? { ...slot, available: false } : slot
-      );
-      setAvailability(updatedAvailability);
-
-      // Update the time slot in Firestore
-      const slotRef = doc(db, "users", productId, "availability", selectedSlot);
+      const slotRef = doc(db, "vendors", productId, "availability", selectedSlot);
       await updateDoc(slotRef, { available: false });
+
+      setAvailability(
+        availability.map((slot) =>
+          slot.id === selectedSlot ? { ...slot, available: false } : slot
+        )
+      );
 
       alert("Reservation successful!");
     } catch (error) {
@@ -89,6 +131,7 @@ const Vendor = () => {
       alert("There was an error making your reservation. Please try again.");
     }
   };
+
   const handleSubmitComment = async () => {
     console.log("Comment:", newComment);
     console.log("Rating:", newRating);
@@ -104,13 +147,13 @@ const Vendor = () => {
 
     try {
       // Reference to the user's comments collection
-      const commentsRef = collection(db, "users", productId, "comments");
+      const commentsRef = collection(db, "vendors", productId, "comments");
       console.log(user);
       // Add a new comment
       await addDoc(commentsRef, {
         comment: newComment,
         rating: newRating,
-        fullName: user.displayName,
+        fullName: currentUser?.displayName || "Anonymous",
       });
 
       // Fetch and update the comments list
@@ -128,51 +171,6 @@ const Vendor = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const userRef = doc(db, "users", productId);
-      const userSnap = await getDoc(userRef);
-
-      if (userSnap.exists()) {
-        setUser(userSnap.data());
-
-        // Fetch availability and images
-        const availabilityRef = collection(userRef, "availability");
-        const availabilitySnap = await getDocs(availabilityRef);
-        setAvailability(availabilitySnap.docs.map((doc) => doc.data()));
-
-        const imagesRef = collection(userRef, "images");
-        const imagesSnap = await getDocs(imagesRef);
-        setImages(imagesSnap.docs.map((doc) => doc.data()));
-
-        // Fetch comments
-        const commentsRef = collection(db, "users", productId, "comments");
-        const commentsSnap = await getDocs(commentsRef);
-        setComments(
-          commentsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-        );
-        fetchCurrentUser().then((userData) => {
-          setCurrentUser(userData);
-        });
-      }
-    };
-
-    fetchUserData();
-  }, [productId]);
-
-  const fetchCurrentUser = async () => {
-    setUser(authentication.currentUser);
-    console.log("Logged in user: ", user); // Add this line to log the logged-in user details
-    if (user) {
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        return userSnap.data(); // This should include the fullName
-      }
-    }
-    return null;
-  };
-  // Render Comments Section
   const renderComments = () => {
     if (comments.length === 0) {
       return (
@@ -266,6 +264,7 @@ const Vendor = () => {
               {renderTimeSlots()}
             </div>
             <button
+              disabled={!currentUser}
               className="bg-thirdColor p-2 mt-4 rounded-md w-40 text-black"
               onClick={handleReservation}
             >

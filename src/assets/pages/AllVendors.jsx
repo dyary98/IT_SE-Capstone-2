@@ -11,14 +11,14 @@ import { authActions } from "../../app/AuthSlice";
 
 // Fetch user details and images
 async function fetchUsersWithRole2() {
-  const usersRef = collection(db, "users");
-  const q = query(usersRef, where("userRole", "==", 2));
+  const usersRef = collection(db, "vendors");
+  const q = query(usersRef);
   const querySnapshot = await getDocs(q);
 
   // Fetch user details and images
   const usersData = await Promise.all(
     querySnapshot.docs.map(async (doc) => {
-      const userImagesRef = collection(db, "users", doc.id, "images");
+      const userImagesRef = collection(db, "vendors", doc.id, "images");
       const imagesSnapshot = await getDocs(userImagesRef);
       const images = imagesSnapshot.docs.map((imgDoc) => imgDoc.data().url);
       return {

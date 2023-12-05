@@ -43,7 +43,11 @@ const Navbar = () => {
     <nav className="bg-white shadow-md">
       <div className="container mx-auto px-6 py-3 flex justify-between items-center">
         <div className="flex items-center">
-          <div className="text-lg font-semibold">AHARS</div>
+          <div className="flex justify-center items-center ">
+            <div className="text-3xl font-bold text-blue-600">
+              VENUE <span className="text-black">STATION</span>
+            </div>
+          </div>{" "}
         </div>
         <div className="flex items-center space-x-4">
           {navLinks.map((link) => (
