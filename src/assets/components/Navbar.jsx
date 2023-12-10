@@ -5,10 +5,15 @@ import { useDispatch, useSelector } from "react-redux"; // Import hooks from rea
 import { authActions } from "../../app/AuthSlice";
 import { authentication } from "../email_signin/config";
 import { signOut } from "firebase/auth"; // Import signOut function
+import i18n from "../../i18n";
 
 const Navbar = () => {
+  const changeLanguage = (event) => {
+    i18n.changeLanguage(event.target.value);
+  };
   const dispatch = useDispatch(); // Hook to dispatch actions
-  const user = useSelector((state) => state.auth.user); // Hook to get the current user from your Redux store
+  const user = useSelector((state) => state.auth.user);
+  console.log("asd" + useSelector((state) => state.auth.user));
   const handleLogout = () => {
     signOut(authentication)
       .then(() => {
@@ -34,8 +39,9 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Home", path: "/" },
-    { name: "Reservation", path: "/reservation" },
+    { name: "Reservation", path: "/vendors" },
     { name: "Map", path: "/map" },
+    { name: "About US", path: "/aboutus" },
     // Add other links as needed
   ];
 
@@ -64,25 +70,42 @@ const Navbar = () => {
             </Link>
           ))}
         </div>
-        <div>
-          {user ? (
-            <div className="flex items-center space-x-4">
-              <AvatarComp name={user.fullName} />
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300"
+        <div className="flex">
+          <select
+            onChange={changeLanguage}
+            value={i18n.language}
+            className="mr-4"
+          >
+            {console.log(i18n.language)}
+            <option value="en">English</option>
+            <option value="ku">Kurdish</option>
+            <option value="ar">Arabic</option>
+          </select>
+          <div>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <Link
+                  to="/userprofile"
+                  className="px-4 py-2 text-blue-500 hover:underline"
+                >
+                  <AvatarComp name={user.email} />
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300"
+                >
+                  Log Out
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
               >
-                Log Out
-              </button>
-            </div>
-          ) : (
-            <Link
-              to="/login"
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
-            >
-              Login
-            </Link>
-          )}
+                Login
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </nav>

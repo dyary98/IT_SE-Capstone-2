@@ -34,13 +34,9 @@ export default function Slider() {
         className="mySwiper"
       >
         <SwiperSlide className="bg-green-950 relative">
-          <img
-            className="w-full rounded-3xl h-full"
-            src={IMAGES.Image4}
-            alt=""
-          />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white p-4 rounded-lg backdrop-blur-sm bg-opacity-40 bg-black">
-            <h2 className="text-4xl mb-2">Stadium 1</h2>
+          <img className="w-full  h-full" src={IMAGES.Image4} alt="" />
+          <div className="absolute bottom-1 left-1 transform   text-white p-4 rounded-lg backdrop-blur-sm bg-opacity-40 bg-black">
+            <h2 className="text-2xl mb-2">Stadium 1</h2>
             <p className="mb-4">
               This is a beautiful stadium located in city 1.
             </p>
@@ -48,13 +44,9 @@ export default function Slider() {
         </SwiperSlide>
 
         <SwiperSlide className="bg-green-950 relative">
-          <img
-            className="w-full rounded-3xl h-full"
-            src={IMAGES.Image5}
-            alt=""
-          />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white p-4 rounded-lg backdrop-blur-sm bg-opacity-40 bg-black">
-            <h2 className="text-4xl mb-2">Stadium 2</h2>
+          <img className="w-full  h-full" src={IMAGES.Image5} alt="" />
+          <div className="absolute bottom-1 left-1 transform   text-white p-4 rounded-lg backdrop-blur-sm bg-opacity-40 bg-black">
+            <h2 className="text-2xl mb-2">Stadium 2</h2>
             <p className="mb-4">
               This is a beautiful stadium located in city 2.
             </p>
@@ -62,13 +54,9 @@ export default function Slider() {
         </SwiperSlide>
 
         <SwiperSlide className="bg-green-950 relative">
-          <img
-            className="w-full rounded-3xl h-full"
-            src={IMAGES.Image4}
-            alt=""
-          />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white p-4 rounded-lg backdrop-blur-sm bg-opacity-40 bg-black">
-            <h2 className="text-4xl mb-2">Stadium 3</h2>
+          <img className="w-full  h-full" src={IMAGES.Image4} alt="" />
+          <div className="absolute bottom-1 left-1 transform   text-white p-4 rounded-lg backdrop-blur-sm bg-opacity-40 bg-black">
+            <h2 className="text-2xl mb-2">Stadium 3</h2>
             <p className="mb-4">
               This is a beautiful stadium located in city 3.
             </p>

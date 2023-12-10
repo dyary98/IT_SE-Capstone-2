@@ -1,60 +1,54 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { authentication, db } from "../email_signin/config";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
-import { collection, onSnapshot, doc, setDoc } from "firebase/firestore";
 
 const SignUp = () => {
-  useEffect(() => {
-    const unsub = onSnapshot(collection(db, "users"), (snapshot) => {
-      snapshot.docs.map((doc) => doc.data());
-    });
-    return unsub;
-  }, []);
-
+  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // State to manage loading effect
 
   const handleSignUp = (e) => {
     e.preventDefault();
+    setIsLoading(true); // Set loading to true
+
     createUserWithEmailAndPassword(authentication, email, password)
       .then((userCredentials) => {
         const user = userCredentials.user;
-        console.log(user);
 
-        // Add a new document with the user's ID as the document ID
+        // Add additional user data to Firestore
         return setDoc(doc(db, "users", user.uid), {
-          fullName: fullName,
-          email: email,
+          fullName,
+          email,
           userRole: 1,
+          phoneNumber,
+          age,
+          gender,
         });
       })
+      .then(() =>
+        updateProfile(authentication.currentUser, { displayName: fullName })
+      )
       .then(() => {
-        return signInWithEmailAndPassword(authentication, email, password);
-      })
-      .then((userCredentials) => {
-        console.log(userCredentials.user);
-        return updateProfile(authentication.currentUser, {
-          displayName: fullName,
-        });
-      })
-      .then(() => {
-        console.log("User profile updated");
+        navigate("/"); // Navigate to homepage
       })
       .catch((error) => {
         console.error("Error: ", error);
-      });
+        alert("Error signing up: " + error.message);
+      })
+      .finally(() => setIsLoading(false)); // Set loading to false regardless of outcome
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Create your account
           </h2>
@@ -108,17 +102,63 @@ const SignUp = () => {
                 placeholder="Password"
               />
             </div>
-          
+            <div>
+              <label htmlFor="phoneNumber" className="sr-only">
+                Phone Number
+              </label>
+              <input
+                id="phoneNumber"
+                name="phoneNumber"
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Phone Number"
+              />
+            </div>
+            <div>
+              <label htmlFor="age" className="sr-only">
+                Age
+              </label>
+              <input
+                id="age"
+                name="age"
+                type="number"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Age"
+              />
+            </div>
+            <div>
+              <label htmlFor="gender" className="sr-only">
+                Gender
+              </label>
+              <select
+                id="gender"
+                name="gender"
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
           </div>
 
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Sign up
-            </button>
-          </div>
+          {/* Submit button */}
+          <button
+            type="submit"
+            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Sign up
+          </button>
         </form>
       </div>
     </div>

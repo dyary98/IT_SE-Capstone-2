@@ -43,7 +43,7 @@ const AdminDashboard = () => {
     const fetchUserData = async () => {
       const user = authentication.currentUser;
       if (user) {
-        const userRef = doc(db, "users", user.uid);
+        const userRef = doc(db, "vendors", user.uid);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           setFullName(userSnap.data().fullName || user.email); // Fallback to email if fullName not available
@@ -51,7 +51,7 @@ const AdminDashboard = () => {
       }
 
       // Fetch images
-      const imagesRef = collection(db, "users", user.uid, "images");
+      const imagesRef = collection(db, "vendors", user.uid, "images");
       const imageQuery = query(imagesRef);
       const imageSnapshots = await getDocs(imageQuery);
       const userImages = imageSnapshots.docs.map((doc) => ({
@@ -61,7 +61,7 @@ const AdminDashboard = () => {
       setImages(userImages);
 
       // Fetch time slots (availability)
-      const availabilityRef = collection(db, "users", user.uid, "availability");
+      const availabilityRef = collection(db, "vendors", user.uid, "availability");
       const availabilityQuery = query(availabilityRef);
       const availabilitySnapshots = await getDocs(availabilityQuery);
       const userAvailability = availabilitySnapshots.docs.map((doc) => ({
@@ -89,7 +89,7 @@ const AdminDashboard = () => {
 
       // Add image URL and description to Firestore
       await addDoc(
-        collection(db, "users", authentication.currentUser.uid, "images"),
+        collection(db, "vendors", authentication.currentUser.uid, "images"),
         {
           url: downloadURL,
           description: description,
@@ -116,7 +116,7 @@ const AdminDashboard = () => {
 
       // Delete the document from Firestore
       await deleteDoc(
-        doc(db, "users", authentication.currentUser.uid, "images", imageId)
+        doc(db, "vendors", authentication.currentUser.uid, "images", imageId)
       );
 
       // Update local state
@@ -136,13 +136,13 @@ const AdminDashboard = () => {
     const newId =
       newTime.id ||
       doc(
-        collection(db, "users", authentication.currentUser.uid, "availability")
+        collection(db, "vendors", authentication.currentUser.uid, "availability")
       ).id;
 
     try {
       // Set the new time slot with the custom ID
       await setDoc(
-        doc(db, "users", authentication.currentUser.uid, "availability", newId),
+        doc(db, "vendors", authentication.currentUser.uid, "availability", newId),
         {
           ...newTime,
           id: newId, // Include the ID in the document if you want to store it
@@ -163,7 +163,7 @@ const AdminDashboard = () => {
     try {
       // Remove time slot from Firestore
       await deleteDoc(
-        doc(db, "users", authentication.currentUser.uid, "availability", timeId)
+        doc(db, "vendors", authentication.currentUser.uid, "availability", timeId)
       );
 
       // Update local state
@@ -183,7 +183,7 @@ const AdminDashboard = () => {
         await setDoc(
           doc(
             db,
-            "users",
+            "vendors",
             authentication.currentUser.uid,
             "availability",
             timeId

@@ -14,8 +14,9 @@ import UsersAdmin from "./assets/pages/UsersAdmin";
 import VendorAdmin from "./assets/pages/VendorAdmin";
 import CreateUser from "./assets/pages/CreateUser";
 import AllVendors from "./assets/pages/AllVendors";
-import { useTranslation } from 'react-i18next';
-
+import { useTranslation } from "react-i18next";
+import UserProfile from "./assets/pages/Profile/UserProfile";
+import AboutUS from "./assets/pages/AboutUS";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -42,26 +43,26 @@ const App = () => {
   console.log(user);
 
   return (
-
-    <div>
+    <div className="bg-white">
       {/* <h1>{t('Game on')}</h1>
       <p>{t('home')}</p> */}
       <Routes>
-      <Route path="/" element={<Home users={user} />} />
-      <Route path="/vendors" element={<AllVendors />} />
-      <Route path="/:productId" element={<Vendor />} />
-      <Route path="/vendors/:productId" element={<Vendor />} />
-      <Route path="/login" element={<Signin />} />
-      <Route path="/Signup" element={<SignUp />} />
-      <Route path="/map" element={<MapBoxJl />} />
-      <Route path="/admin" element={<Admin />} />
-      <Route path="/admin/users" element={<UsersAdmin />} />
-      <Route path="/admin/users/create" element={<CreateUser />} />
-      <Route path="/admin/settings" element={<SettingsAdmin />} />
-      <Route path="/admin/vendor" element={<VendorAdmin />} />
-    </Routes>
+        <Route path="/" element={<Home users={user} />} />
+        <Route path="/userprofile" element={<UserProfile />} />
+        <Route path="/aboutus" element={<AboutUS />} />
+        <Route path="/vendors" element={<AllVendors />} />
+        <Route path="/:productId" element={<Vendor />} />
+        <Route path="/vendors/:productId" element={<Vendor />} />
+        <Route path="/login" element={<Signin />} />
+        <Route path="/Signup" element={<SignUp />} />
+        <Route path="/map" element={<MapBoxJl />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin/users" element={<UsersAdmin />} />
+        <Route path="/admin/users/create" element={<CreateUser />} />
+        <Route path="/admin/settings" element={<SettingsAdmin />} />
+        <Route path="/admin/vendor" element={<VendorAdmin />} />
+      </Routes>
     </div>
-    
   );
 };
 

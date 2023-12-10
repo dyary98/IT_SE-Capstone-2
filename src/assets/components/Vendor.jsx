@@ -14,11 +14,13 @@ import {
 } from "firebase/firestore";
 import { authentication, db } from "../email_signin/config";
 import { authActions } from "../../app/AuthSlice";
+import Navbar from "./Navbar";
 
 const Vendor = () => {
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.auth.user); // Access the current user from Redux store
 
+  console.log("crnt user" + currentUser.email);
   const { productId } = useParams();
   const [user, setUser] = useState(null);
   const [images, setImages] = useState([]);
@@ -116,7 +118,13 @@ const Vendor = () => {
       const reservationsRef = collection(db, "reservations");
       await addDoc(reservationsRef, reservationDetails);
 
-      const slotRef = doc(db, "vendors", productId, "availability", selectedSlot);
+      const slotRef = doc(
+        db,
+        "vendors",
+        productId,
+        "availability",
+        selectedSlot
+      );
       await updateDoc(slotRef, { available: false });
 
       setAvailability(
@@ -233,95 +241,98 @@ const Vendor = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      {user ? (
-        <>
-          {/* User Details */}
-          <div className="w-full h-[60vh] flex justify-center items-center">
-            <img
-              src={images.length > 0 ? images[0].url : "default_image_url"}
-              alt={user.fullName}
-              className="w-full m-8 h-full object-cover rounded-lg shadow-lg shadow-green-950"
-            />
-          </div>
-          <div className="shadow-green-950 flex flex-col mx-8 border-2 border-black rounded-3xl my-8 p-8 shadow-2xl p">
-            <h1 className="text-5xl mt-4 mr-8 mb-2">{user.fullName}</h1>
-            <div className="flex items-center">
-              <h1 className="text-2xl mt-6 mr-8 mb-2">
-                {user.price || "Price not available"}
-              </h1>
-              <h1 className="text-2xl mt-6 mb-2 flex">
-                <ImLocation className="mr-1" size={40} /> {user.location}
-              </h1>
+    <>
+      <Navbar />
+      <div className="container mx-auto p-4">
+        {user ? (
+          <>
+            {/* User Details */}
+            <div className="w-full h-[60vh] flex justify-center items-center">
+              <img
+                src={images.length > 0 ? images[0].url : "default_image_url"}
+                alt={user.fullName}
+                className="w-full m-8 h-full object-cover rounded-lg shadow-lg shadow-green-950"
+              />
             </div>
-            <p className="text-lg mb-8">{user.description}</p>
-          </div>
-
-          {/* Availability Time Slots */}
-          <div className="mb-8 bg-primaryColor p-8 rounded-3xl text-white mx-8 shadow-2xl shadow-white">
-            <h2 className="text-3xl mb-4">Available Time Slots</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {renderTimeSlots()}
-            </div>
-            <button
-              disabled={!currentUser}
-              className="bg-thirdColor p-2 mt-4 rounded-md w-40 text-black"
-              onClick={handleReservation}
-            >
-              Reserve
-            </button>
-          </div>
-
-          {/* Add Comment Section */}
-
-          {user && (
-            <div className="mb-8 mx-8 p-4 rounded-3xl border-2 border-black shadow-2xl shadow-green-950">
-              <h2 className="text-3xl mb-4">Add a Comment</h2>
-              <div className="flex flex-col">
-                <textarea
-                  className="p-2 border rounded-lg mb-4"
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Write your comment here..."
-                ></textarea>
-                <div className="flex">
-                  {[...Array(5)].map((_, index) => (
-                    <FaStar
-                      key={index}
-                      className="cursor-pointer"
-                      size={30}
-                      onMouseEnter={() => setHoverRating(index + 1)}
-                      onMouseLeave={() => setHoverRating(newRating)}
-                      onClick={() => setNewRating(index + 1)}
-                      color={
-                        index < (hoverRating || newRating)
-                          ? "#ffc107"
-                          : "#e4e5e9"
-                      }
-                    />
-                  ))}
-                </div>
-                <button
-                  className="bg-thirdColor mt-4 p-2 rounded-md text-black"
-                  onClick={handleSubmitComment}
-                >
-                  Submit Comment
-                </button>
+            <div className="shadow-green-950 flex flex-col mx-8 border-2 border-black rounded-3xl my-8 p-8 shadow-2xl p">
+              <h1 className="text-5xl mt-4 mr-8 mb-2">{user.fullName}</h1>
+              <div className="flex items-center">
+                <h1 className="text-2xl mt-6 mr-8 mb-2">
+                  {user.price || "Price not available"}
+                </h1>
+                <h1 className="text-2xl mt-6 mb-2 flex">
+                  <ImLocation className="mr-1" size={40} /> {user.location}
+                </h1>
               </div>
+              <p className="text-lg mb-8">{user.description}</p>
             </div>
-          )}
 
-          {/* Comments Section */}
-          {/* Comments Section */}
-          <div className="mb-8 mx-8 p-4 rounded-3xl border-2 border-black shadow-2xl shadow-green-950">
-            <h2 className="text-3xl mb-4">Comments and Ratings</h2>
-            <ul>{renderComments()}</ul>
-          </div>
-        </>
-      ) : (
-        <p>User not found</p>
-      )}
-    </div>
+            {/* Availability Time Slots */}
+            <div className="mb-8 bg-primaryColor p-8 rounded-3xl text-white mx-8 shadow-2xl shadow-white">
+              <h2 className="text-3xl mb-4">Available Time Slots</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {renderTimeSlots()}
+              </div>
+              <button
+                disabled={!currentUser}
+                className="bg-thirdColor p-2 mt-4 rounded-md w-40 text-black"
+                onClick={handleReservation}
+              >
+                Reserve
+              </button>
+            </div>
+
+            {/* Add Comment Section */}
+
+            {user && (
+              <div className="mb-8 mx-8 p-4 rounded-3xl border-2 border-black shadow-2xl shadow-green-950">
+                <h2 className="text-3xl mb-4">Add a Comment</h2>
+                <div className="flex flex-col">
+                  <textarea
+                    className="p-2 border rounded-lg mb-4"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Write your comment here..."
+                  ></textarea>
+                  <div className="flex">
+                    {[...Array(5)].map((_, index) => (
+                      <FaStar
+                        key={index}
+                        className="cursor-pointer"
+                        size={30}
+                        onMouseEnter={() => setHoverRating(index + 1)}
+                        onMouseLeave={() => setHoverRating(newRating)}
+                        onClick={() => setNewRating(index + 1)}
+                        color={
+                          index < (hoverRating || newRating)
+                            ? "#ffc107"
+                            : "#e4e5e9"
+                        }
+                      />
+                    ))}
+                  </div>
+                  <button
+                    className="bg-thirdColor mt-4 p-2 rounded-md text-black"
+                    onClick={handleSubmitComment}
+                  >
+                    Submit Comment
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Comments Section */}
+            {/* Comments Section */}
+            <div className="mb-8 mx-8 p-4 rounded-3xl border-2 border-black shadow-2xl shadow-green-950">
+              <h2 className="text-3xl mb-4">Comments and Ratings</h2>
+              <ul>{renderComments()}</ul>
+            </div>
+          </>
+        ) : (
+          <p>User not found</p>
+        )}
+      </div>
+    </>
   );
 };
 

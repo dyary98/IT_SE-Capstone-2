@@ -1,23 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { authentication, provider } from "../email_signin/config";
+import { authentication, db, provider } from "../email_signin/config";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import Home from "../pages/Home";
 import { Link, useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
 const Signin = () => {
   const [value, setValue] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+
   const navigate = useNavigate();
-  const handlSignIn = (e) => {
+  const handlSignIn = async (e) => {
     e.preventDefault();
-    signInWithEmailAndPassword(authentication, email, password)
-      .then((userCredentials) => {
-        console.log(userCredentials);
+    try {
+      const userCredentials = await signInWithEmailAndPassword(
+        authentication,
+        email,
+        password
+      );
+      console.log(userCredentials);
+
+      // Check if the user is a vendor
+      const vendorRef = doc(db, "vendors", userCredentials.user.uid);
+      const vendorDoc = await getDoc(vendorRef);
+
+      if (vendorDoc.exists()) {
+        // User is a vendor, navigate to admin/vendor page
+        navigate("/admin/vendor");
+      } else {
+        // User is not a vendor, navigate to home page
         navigate("/");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   const handleClick = () => {
     signInWithPopup(authentication, provider).then((data) => {
